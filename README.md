@@ -14,4 +14,4 @@ Open browser on the below address
 http://localhost:3000/
 ```
 
-![slack clone inital](screenshots/slack_clone_initial.jpg)
+![slack clone inital](screenshots/slack_clone.jpg)
