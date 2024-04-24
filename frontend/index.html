@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Chat</title>
+    <script>
+      var socket;
+
+      function connectWebSocket() {
+        var username = document.getElementById("username").value;
+        socket = new WebSocket("ws://localhost:8080/ws/" + username);
+
+        socket.onopen = function () {
+          console.log("WebSocket connection established");
+          fetchUsers(); // Fetch users after the connection is opened
+        };
+
+        socket.onmessage = function (event) {
+          var chatBox = document.getElementById("chatbox");
+          var msg = JSON.parse(event.data);
+          chatBox.value += msg.sender + ": " + msg.content + "\n";
+        };
+
+        socket.onerror = function (event) {
+          console.error("WebSocket error observed:", event);
+        };
+      }
+
+      function sendMessage() {
+        var message = document.getElementById("message").value;
+        var receiver = document.getElementById("receiver").value;
+        var msg = {
+          sender: document.getElementById("username").value,
+          receiver: receiver,
+          content: message,
+        };
+        socket.send(JSON.stringify(msg));
+      }
+
+      function fetchUsers() {
+        fetch("http://localhost:8080/users")
+          .then((response) => response.json())
+          .then((data) => {
+            var userList = document.getElementById("userList");
+            userList.innerHTML = ""; // Clear existing entries
+            data.forEach(function (user) {
+              userList.innerHTML += user + "<br>";
+            });
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchUsers(); // Fetch users immediately when the page loads
+      });
+    </script>
+  </head>
+  <body>
+    <input type="text" id="username" placeholder="Username" /><button
+      onclick="connectWebSocket()"
+    >
+      Connect</button
+    ><br />
+    <textarea id="chatbox" cols="30" rows="10" readonly></textarea><br />
+    <input type="text" id="receiver" placeholder="Receiver username" />
+    <input type="text" id="message" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+    <h2>Connected Users</h2>
+    <div id="userList"></div>
+  </body>
+</html>
