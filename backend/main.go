@@ -10,14 +10,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[string]*websocket.Conn)
-var broadcast = make(chan Message)
+var clients = make(map[string]*websocket.Conn) // map username to websocket connection
+var broadcast = make(chan Message)             // broadcast channel for messages
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
-var mutex sync.Mutex
+var mutex sync.Mutex // mutex to protect clients map
 
 // Message object
 type Message struct {
@@ -28,15 +28,19 @@ type Message struct {
 
 func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set headers
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
+		// If this is a preflight request, the method will be OPTIONS,
+		// so call the PreflightHandler function and end the request.
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r)
 	})
 }

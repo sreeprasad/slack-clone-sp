@@ -18,7 +18,7 @@
           var data = JSON.parse(event.data);
           if (Array.isArray(data)) {
             var userList = document.getElementById("userList");
-            userList.innerHTML = ""; // Clear existing entries
+            userList.innerHTML = "";
             data.forEach(function (user) {
               userList.innerHTML += user + "<br>";
             });
@@ -61,7 +61,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        fetchUsers(); // Fetch users immediately when the page loads
+        fetchUsers();
       });
     </script>
   </head>
