@@ -14,4 +14,11 @@ Open browser on the below address
 http://localhost:3000/
 ```
 
+Add a user name and click on the "Connect" button
+
+Open another browser tab and connect using a differnt username
+Now go back to previous tab and use the second username and add text message 
+and click on the "send" button.
+In the second tab you should see the message send from the first user.
+
 ![slack clone inital](screenshots/slack_clone.jpg)
