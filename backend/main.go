@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[string]*websocket.Conn) // map username to websocket connection
-var broadcast = make(chan Message)             // broadcast channel for messages
+var clients = make(map[string]*websocket.Conn)
+var broadcast = make(chan Message) // broadcast channel for messages
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -69,6 +69,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("added user %s\n", username)
 	mutex.Unlock()
 
+	broadcastUserList()
+
 	for {
 		var msg Message
 		err := ws.ReadJSON(&msg)
@@ -79,6 +81,17 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		broadcast <- msg
+	}
+}
+
+func broadcastUserList() {
+	var userList []string
+	for user := range clients {
+		userList = append(userList, user)
+	}
+	userListJSON, _ := json.Marshal(userList)
+	for _, client := range clients {
+		client.WriteMessage(websocket.TextMessage, userListJSON)
 	}
 }
 
